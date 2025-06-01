@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Category = require('../models/categoryModel');
 const { default: slugify } = require('slugify');
+const ApiError = require('../utils/apiError');
 
 /*
 @desc    Create a new category
@@ -39,11 +40,11 @@ exports.getCategories = asyncHandler(async (req, res) => {
 @access  Public
 @returns {Object} - The category object with the specified ID
 */
-exports.getCategory = asyncHandler (async (req, res) => {
+exports.getCategory = asyncHandler (async (req, res, next) => {
     const {id} = req.params;
     const category = await Category.findById(id);
     if(!category) {
-        return res.status(404).json({ success: false, message: 'Category not found' });
+        return next(new ApiError(`No Category for this ${id}`, 404))
     }
     res.status(200).json({ success: true, data: category });
 });
@@ -54,7 +55,7 @@ exports.getCategory = asyncHandler (async (req, res) => {
 @access  Private (Admin)
 @returns {Object} - The updated category object
 */
-exports.updateCategory = asyncHandler(async (req, res) => {
+exports.updateCategory = asyncHandler(async (req, res, next) => {
     const {id} = req.params;
     const {name} = req.body;
     const category = await Category.findOneAndUpdate(
@@ -63,17 +64,17 @@ exports.updateCategory = asyncHandler(async (req, res) => {
         { new: true} // Return the updated document
     );
     if (!category) {
-        return res.status(404).json({ success: false, message: 'Category not found' });
+        return next(new ApiError(`No Category for this ${id}`, 404))
     }
     res.status(200).json({ success: true, data: category });
 });
 
 
-exports.deleteCategory = asyncHandler(async (req, res) => {
+exports.deleteCategory = asyncHandler(async (req, res, next) => {
     const {id} = req.params;
     const category = await Category.findByIdAndDelete(id);
     if (!category) {
-        return res.status(404).json({ success: false, message: 'Category not found' });
+        return next(new ApiError(`No Category for this ${id}`, 404))
     }
     res.status(204).json();
 });
