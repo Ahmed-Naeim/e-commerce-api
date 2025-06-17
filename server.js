@@ -9,6 +9,7 @@ const dbConnection = require('./config/database');
 const categoryRoute = require('./routes/categoryRoute');
 const subCategoryRoute = require('./routes/subCategoryRoute');
 const brandRoute = require('./routes/brandRoute');
+const productRoute = require('./routes/productRoute');
 
 // Connect to database
 dbConnection();
@@ -31,6 +32,8 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/category', categoryRoute);
 app.use('/api/v1/subcategory', subCategoryRoute);
 app.use('/api/v1/brand', brandRoute);
+app.use('/api/v1/product', productRoute);
+
 
 // Handling undefined routes
 app.all(/.*/, (req, res, next) => {

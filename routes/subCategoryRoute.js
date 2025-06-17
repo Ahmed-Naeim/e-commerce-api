@@ -10,12 +10,14 @@ const { createSubCategory,
     getSubCategories, 
     getSubCategory, 
     updateSubCategory, 
-    deleteSubCategory
+    deleteSubCategory,
+    createFilterObj,
+    setCategoryIdToBody
 } = require('../services/subCategoryService');
 
 router.route('/')
-    .post(createSubCategoryValidator, createSubCategory)
-    .get(getSubCategories);
+    .post(setCategoryIdToBody, createSubCategoryValidator, createSubCategory)
+    .get(createFilterObj, getSubCategories);
 
 router.route('/:id')
     .get(getSubCategoryValidator, getSubCategory)

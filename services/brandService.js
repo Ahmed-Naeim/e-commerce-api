@@ -1,7 +1,7 @@
+const asyncHandler = require('express-async-handler');
 const Brand = require('../models/brandModel');
 const { default: slugify } = require('slugify');
 const ApiError = require('../utils/apiError');
-const asyncHandler = require('../utils/asyncHandler');
 
 const createBrand = asyncHandler(async (req, res) => {
     const { name } = req.body;
@@ -27,6 +27,7 @@ const getBrand = asyncHandler(async (req, res, next) => {
 });
 
 const updateBrand = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
     const { name, image } = req.body;
     const brand = await Brand.findByIdAndUpdate(req.params.id, {
         name,
