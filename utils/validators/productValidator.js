@@ -1,12 +1,20 @@
+const slugify = require('slugify');
 const { check } = require("express-validator");
 const Product = require("../../models/productModel");
+const validatorMiddleware = require('../../middlewares/validatorMiddleware');
+
 
 const createProductValidator = [
     check("title")
         .notEmpty()
         .withMessage("Product title is required")
         .isLength({ min: 3, max: 100 })
-        .withMessage("Product title must be between 3 and 100 characters long"),
+        .withMessage("Product title must be between 3 and 100 characters long")
+        .custom((val, {req}) =>{ //don’t forget to import body with check or do it with check will be fine
+        req.body.slug = slugify(val);
+        return true;
+    })
+    ,
     check("description")
         .notEmpty()
         .withMessage("Product description is required")
@@ -97,14 +105,16 @@ const createProductValidator = [
             if(!checker(val, subCategoriesIdsInDB)){
                 throw new Error(`Sub Categories is not belong to this category`);
             }
-        })
+        }),
+        validatorMiddleware,
     
 ];
 
 const getProductValidator = [
     check("id")
         .isMongoId()
-        .withMessage("Invalid product ID format")
+        .withMessage("Invalid product ID format"),
+        validatorMiddleware,
 ];
 
 const getProductsValidator = [
@@ -116,19 +126,27 @@ const getProductsValidator = [
         .optional()
         .isInt({ min: 1, max: 100 })
         .withMessage("Limit must be between 1 and 100"),
+        validatorMiddleware,
 ];
 
 const updateProductValidator = [
     check("id")
         .isMongoId()
         .withMessage("Invalid product ID format"),
-    ...createProductValidator.slice(1) // Reuse the same validation rules for other fields
+    check('title')
+        .optional()
+        .custom((val, { req }) => {
+            req.body.slug = slugify(val);
+            return true;
+        }),
+    validatorMiddleware,
 ];
 
 const deleteProductValidator = [
     check("id")
         .isMongoId()
-        .withMessage("Invalid product ID format")
+        .withMessage("Invalid product ID format"),
+        validatorMiddleware,
 ];
 
 module.exports = {

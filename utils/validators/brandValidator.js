@@ -1,3 +1,4 @@
+const slugify = require('slugify');
 const {check} = require('express-validator');
 const validatorMiddleware = require('../../middlewares/validatorMiddleware');
 
@@ -8,7 +9,12 @@ exports.createBrandValidator = [
     .isLength({ min: 2 })
     .withMessage('Brand name must be at least 3 characters long')
     .isLength({ max: 50 })
-    .withMessage('Brand name must not exceed 50 characters'),
+    .withMessage('Brand name must not exceed 50 characters')
+    .optional()
+    .custom((val, { req }) => {
+        req.body.slug = slugify(val);
+        return true;
+    }),
     validatorMiddleware,
 ];
 
@@ -24,7 +30,12 @@ exports.updateBrandValidator = [
         .isLength({ min: 2 })
         .withMessage('Brand name must be at least 3 characters long')
         .isLength({ max: 50 })
-        .withMessage('Brand name must not exceed 50 characters'),
+        .withMessage('Brand name must not exceed 50 characters')
+        .optional()
+        .custom((val, { req }) => {
+            req.body.slug = slugify(val);
+            return true;
+        }),
     validatorMiddleware,
 ];
 

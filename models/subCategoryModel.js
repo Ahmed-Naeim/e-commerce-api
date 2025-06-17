@@ -20,6 +20,14 @@ const subCategorySchema = new mongoose.Schema({
 }, {timestamps: true}
 );
 
+subCategorySchema.pre(/^find/, function (next) { //to populate category name
+	this.populate ({
+		path: 'category',
+		select: 'name'
+});
+next();
+});
+
 const SubCategoryModel = mongoose.model('SubCategory', subCategorySchema);
 
 module.exports = SubCategoryModel;
