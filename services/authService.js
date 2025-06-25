@@ -19,13 +19,12 @@ exports.signup = asyncHandler(async(req, res, next)=>{
 
     //send response
     res.status(201).json({data:user, token})
-    next();
 });
 
 exports.login = asyncHandler(async(req, res, next)=>{
     //check if email and password are valid
     const user = await User.findOne({email: req.body.email});
-    if(!user || (await bcrypt.compare(req.body.password, user.password))){
+    if(!user || !(await bcrypt.compare(req.body.password, user.password))){
         return next(ApiError("The email or password are not valid", 401));
     }
 
@@ -34,13 +33,14 @@ exports.login = asyncHandler(async(req, res, next)=>{
 
     //send response
     res.status(200).json({data:user, token});
-    next();
 });
 
 exports.protect = asyncHandler(async(req, res, next)=>{
+
+    let token;
     //check if the token exists
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
-        const token = req.headers.authorization.split(' ')[1]
+        token = req.headers.authorization.split(' ')[1]
     }
     if(!token)
         return next(new ApiError("Please login", 401));
@@ -67,3 +67,17 @@ exports.protect = asyncHandler(async(req, res, next)=>{
     req.user = currentUser;
     next();
 })
+
+// @desc    Authorization (User Permissions)
+// ["admin", "manager"]
+exports.allowedTo = (...roles) =>
+    asyncHandler(async (req, res, next) => {
+        // 1) access roles
+        // 2) access registered user (req.user.role)
+        if (!roles.includes(req.user.role)) {
+            return next(
+            new ApiError('You are not allowed to access this route', 403)
+            );
+        }
+        next();
+    });

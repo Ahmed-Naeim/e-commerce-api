@@ -10,8 +10,12 @@ const { createCategory,
     getCategories, 
     getCategory, 
     updateCategory, 
-    deleteCategory
+    deleteCategory,
+    uploadCategoryImage,
+    resizeImage
 } = require('../services/categoryService');
+const authService = require('../services/authService');
+
 
 /* Importing subCategoryRoute to handle sub-categories under a specific category
 This allows us to modularize the routes and keep the code organized.
@@ -22,12 +26,28 @@ const subCategoryRoute = require('./subCategoryRoute');
 router.use('/:categoryId/subCategory', subCategoryRoute);
 
 router.route('/')
-    .post(createCategoryValidator, createCategory)
+    .post(    
+        authService.protect,
+        authService.allowedTo('admin', 'manager'),
+        uploadCategoryImage,
+        resizeImage,
+        createCategoryValidator,
+        createCategory)
     .get(getCategoriesValidator, getCategories);
 
 router.route('/:id')
     .get(getCategoryValidator, getCategory)
-    .put(updateCategoryValidator, updateCategory)
-    .delete(deleteCategoryValidator, deleteCategory);
+    .put(    
+        authService.protect,
+        authService.allowedTo('admin', 'manager'),
+        uploadCategoryImage,
+        resizeImage,
+        updateCategoryValidator,
+        updateCategory)
+    .delete(    
+        authService.protect,
+        authService.allowedTo('admin'),
+        deleteCategoryValidator,
+        deleteCategory);
 
 module.exports = router;

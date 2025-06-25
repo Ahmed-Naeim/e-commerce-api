@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const {createUser, getUsers, getUser, updateUser, deleteUser, changeUserPassword} = require('../services/userService');
+const {createUser, getUsers, getUser, updateUser, deleteUser, changeUserPassword, uploadUserImage, resizeImage} = require('../services/userService');
 const {createUserValidator, getUserValidator, updateUserValidator, changeUserPasswordValidator, deleteUserValidator} = require('../utils/validators/userValidator');
+const authService = require('../services/authService');
+
 
 router.route('/')
-    .post(createUserValidator, createUser)
+    .post(uploadUserImage, resizeImage, createUserValidator, createUser)
     .get(getUsers);
 
 router.route('/:id')
     .get(getUserValidator, getUser)
-    .put(updateUserValidator, updateUser)
+    .put(uploadUserImage, resizeImage, updateUserValidator, updateUser)
     .delete(deleteUserValidator, deleteUser);
 
 router.route('/change-password/:id')
