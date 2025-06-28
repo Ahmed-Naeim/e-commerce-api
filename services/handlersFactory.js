@@ -39,7 +39,7 @@ exports.getOne = (Model, populationOpt)=>
             query = query.populate(populationOpt);
         }
 
-        const doc = query;
+        const doc = await query;
 
         if (!doc) {
             return next(new ApiError(`No document found for this ID: ${id}`, 404));

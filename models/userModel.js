@@ -31,6 +31,12 @@ const userSchema = new mongoose.Schema({
         minlength: [6, "the password needs to be more than 6 characters or digits"]
     },
     passwordChangedAt: Date,
+    passwordResetCode: String,
+    passwordResetExpires: Date,
+    passwordResetVerified: {
+        type: Boolean,
+        default: false
+    },
     role:{
         type: String,
         enum: ["user", "manager", "admin"],

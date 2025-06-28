@@ -59,10 +59,11 @@ const getUser = factory.getOne(User);
  * @returns {Object} - The updated product object
  */
 const updateUser = asyncHandler(async (req, res, next) => {
-        const doc = await User.findOneAndUpdate(
+        const doc = await User.findByIdAndUpdate(
             req.params.id,
             {
                 name: req.body.name,
+                slug: req.body.slug,
                 email: req.body.email,
                 phone: req.body.phone,
                 profileImg: req.body.profileImg,

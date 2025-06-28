@@ -4,6 +4,8 @@ const {createUser, getUsers, getUser, updateUser, deleteUser, changeUserPassword
 const {createUserValidator, getUserValidator, updateUserValidator, changeUserPasswordValidator, deleteUserValidator} = require('../utils/validators/userValidator');
 const authService = require('../services/authService');
 
+router.use(authService.protect);
+router.use(authService.allowedTo('admin', 'manager'));
 
 router.route('/')
     .post(uploadUserImage, resizeImage, createUserValidator, createUser)

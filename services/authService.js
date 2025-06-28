@@ -2,6 +2,9 @@ const asyncHandler = require('express-async-handler');
 const ApiError = require('../utils/apiError');
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const sendEmail = require('../utils/sendEmail');
+const bcrypt = require('bcryptjs');
+
 
 const createToken = (payload)=>jwt.sign({userId: payload},process.env.JWT_SECRET_KEY,{
         expiresIn: process.env.JWT_EXPIRE_TIME})
@@ -25,7 +28,7 @@ exports.login = asyncHandler(async(req, res, next)=>{
     //check if email and password are valid
     const user = await User.findOne({email: req.body.email});
     if(!user || !(await bcrypt.compare(req.body.password, user.password))){
-        return next(ApiError("The email or password are not valid", 401));
+        return next(new ApiError("The email or password are not valid", 401));
     }
 
     //generate jwt
@@ -35,6 +38,10 @@ exports.login = asyncHandler(async(req, res, next)=>{
     res.status(200).json({data:user, token});
 });
 
+// @desc    Protect routes
+// @access  Private
+// @returns {Object} - The current user object
+// Make sure to use this middleware before any protected route
 exports.protect = asyncHandler(async(req, res, next)=>{
 
     let token;
@@ -54,9 +61,10 @@ exports.protect = asyncHandler(async(req, res, next)=>{
     const currentUser = await User.findById(decoded.userId);
 
     if(!currentUser)
-        return new ApiError("User is not found", 401);
+        return next(new ApiError("User is not found", 401));
 
     //check if the user change the password after the token created
+    let passwordChangedAtTimeStamp;
     if(currentUser.passwordChangedAt){
         const passwordChangedAtTimeStamp = parseInt(currentUser.passwordChangedAt.getTime() / 1000, 10);
     }
@@ -81,3 +89,42 @@ exports.allowedTo = (...roles) =>
         }
         next();
     });
+
+exports.forgotPassword = asyncHandler(async(req, res, next)=>{
+    //1) get user by email
+    const user = await User.findOne({email: req.body.email});
+
+    if(!user)
+        return next(new ApiError("There is no user with this email", 404));
+
+    //2) generate reset token and save the hashed token in the database
+    const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+    const resetTokenHash = require('crypto')
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+    user.passwordResetCode = resetTokenHash;
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000
+
+    await user.save();
+
+    //3) send the reset token to the user email
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: "Password Reset Token",
+            message: `Hello ${user.name}!!\nYour password reset token is: ${resetToken}\nPlease use it within the next 10 minutes.\nIf you didn't request this, please ignore this email.\nE-commerce App Team`
+        });
+    }
+    catch (error) {
+        user.passwordResetCode = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save();
+        return next(new ApiError("There is an error in sending the email, please try again later", 500));
+    }
+
+    res.status(200).json({
+        status: "success",
+        message: "Reset token sent to your email"
+    });
+});

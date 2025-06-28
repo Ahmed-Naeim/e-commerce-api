@@ -1,6 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const cors = require('cors');
+const compression = require('compression');
 
 dotenv.config({path: './config/config.env'});
 const ApiError = require('./utils/apiError');
@@ -23,6 +25,10 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+// Middleware for CORS
+app.use(cors());
+// Middleware for compression
+app.use(compression());
 
 // Middleware for logging HTTP requests
 if (process.env.NODE_ENV === 'development') {
@@ -49,7 +55,7 @@ app.all(/.*/, (req, res, next) => {
 app.use(globalError);
 
 const server = app.listen(PORT, () => {
-    console.log(`App Running on Port ${PORT}`)
+    console.log(`App Running on Port ${PORT}`);
 });
 
 process.on('unhandledRejection', (err) => {

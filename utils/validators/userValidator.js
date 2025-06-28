@@ -51,9 +51,9 @@ const getUserValidator = [
 ];
 
 const updateUserValidator = [
-
+    check('id').isMongoId().withMessage("Invalid User ID"),
     check('name')
-        .notEmpty().withMessage("The name is required")
+        .optional()
         .isLength({min:3 , max:32}).withMessage("The name length must be between 3 and 32")
         .custom((val, {req})=>{
         req.body.slug = slugify(val);
