@@ -54,7 +54,7 @@ app.all(/.*/, (req, res, next) => {
 //handling express errors
 app.use(globalError);
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT,'0.0.0.0' , () => {
     console.log(`App Running on Port ${PORT}`);
 });
 
