@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const ApiError = require('../utils/apiError');
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-const sendEmail = require('../utils/sendEmail');
+const {sendEmail} = require('../utils/sendEmail');
 const bcrypt = require('bcryptjs');
 
 
@@ -90,6 +90,8 @@ exports.allowedTo = (...roles) =>
         next();
     });
 
+// @desc    Forgot Password
+// @access  Public
 exports.forgotPassword = asyncHandler(async(req, res, next)=>{
     //1) get user by email
     const user = await User.findOne({email: req.body.email});
@@ -120,6 +122,7 @@ exports.forgotPassword = asyncHandler(async(req, res, next)=>{
         user.passwordResetCode = undefined;
         user.passwordResetExpires = undefined;
         await user.save();
+        console.error('Nodemailer error:', error);
         return next(new ApiError("There is an error in sending the email, please try again later", 500));
     }
 
@@ -128,3 +131,64 @@ exports.forgotPassword = asyncHandler(async(req, res, next)=>{
         message: "Reset token sent to your email"
     });
 });
+
+// @desc    Verify the reset code
+// @access  Public
+exports.verifyResetCode = asyncHandler(async(req, res, next)=>{
+    //get the user based on the reset code
+    const user = await User.findOne({
+        passwordResetCode: require('crypto')
+            .createHash('sha256')
+            .update(req.body.resetCode)
+            .digest('hex'),
+        passwordResetExpires: {$gt: Date.now()}
+    });
+
+    if(!user)
+        return next(new ApiError("Reset code is invalid or expired", 400)); //400 Bad Request
+
+    //make the passwordResetVerified true and save the changes to user
+    user.passwordResetVerified = true;
+    await user.save();
+
+    //send response
+    res.status(200).json({
+        status: "success",
+        message: "Reset code verified successfully"
+    });
+});
+
+
+// @desc    Reset Password
+// @access  Public
+exports.resetPassword = asyncHandler(async(req, res, next)=>{
+    //get the user based on the email
+    const user = await User.findOne({email: req.body.email});
+    if(!user)
+        return next(new ApiError("There is no user with this email", 404));
+
+    //check if the passwordResetVerified is true
+    if(!user.passwordResetVerified)
+        return next(new ApiError("Please verify your reset code first", 400)); //400 Bad Request
+
+    //set the new password to the user and give the passwordResetCode, passwordResetExpires and passwordResetVerified undefined
+    user.password = req.body.newPassword;
+
+    user.passwordResetCode = undefined;
+    user.passwordResetExpires = undefined;
+    user.passwordResetVerified = false;
+
+    //save the user changes
+    await user.save();
+
+    //generate a new token
+    const token = createToken(user._id);
+
+    //send response
+    res.status(200).json({
+        status: "success",
+        message: "Password reset successfully",
+        token
+    });
+});
+

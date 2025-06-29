@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const SMTPTransport = require("nodemailer/lib/smtp-transport");
 
 exports.sendEmail = async (options) => {
     //Create a transporter
@@ -14,13 +15,17 @@ exports.sendEmail = async (options) => {
 
     //Define the email options
     const mailOptions = {
-        from: `E-commerce App <${process.env.EMAIL_USER}>`,
+        from: `E-commerce App <${process.env.EMAIL_USERNAME}>`,
         to: options.email,
         subject: options.subject,
         text: options.message
     };
 
     //Send the email
-    await transporter.sendMail(mailOptions);
-
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (err) {
+        console.error('Nodemailer error:', err);
+        throw err;
+    }
 }
