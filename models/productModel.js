@@ -76,7 +76,11 @@ const productSchema = new mongoose.Schema({
         default: 0,
         min: [0, 'Ratings quantity must be a positive number']
     }
-}, { timestamps: true });
+}, { 
+    timestamps: true, 
+    toJSON: { virtuals: true }, // to include virtuals in JSON output
+    toObject: { virtuals: true } // to include virtuals in object output
+});
 
 productSchema.pre(/^find/, function (next) { //to populate category name
 	this.populate ({
@@ -86,6 +90,11 @@ productSchema.pre(/^find/, function (next) { //to populate category name
 next();
 });
 
+productSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'product',
+    localField: '_id'
+});
 
 const ProductModel = mongoose.model('Product', productSchema);
 

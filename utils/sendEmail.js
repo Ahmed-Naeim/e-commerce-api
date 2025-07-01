@@ -22,10 +22,5 @@ exports.sendEmail = async (options) => {
     };
 
     //Send the email
-    try {
-        await transporter.sendMail(mailOptions);
-    } catch (err) {
-        console.error('Nodemailer error:', err);
-        throw err;
-    }
+    await transporter.sendMail(mailOptions);
 }

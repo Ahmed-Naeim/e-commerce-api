@@ -111,10 +111,37 @@ const deleteUserValidator = [
     validatorMiddleware
 ];
 
+const updateLoggedUserDataValidator = [
+    check('name')
+        .optional()
+        .isLength({min:3 , max:32}).withMessage("The name length must be between 3 and 32")
+        .custom((val, {req})=>{
+            req.body.slug = slugify(val);
+            return true;
+        }),
+    check('email')
+        .optional()
+        .isEmail().withMessage("The email must be valid"),
+    check('phone')
+        .optional()
+        .isMobilePhone(['ar-EG','ar-SA']).withMessage("Invalid phone number only accepted Egy and SA Phone numbers"),
+    check('profileImg')
+        .optional(),
+
+    validatorMiddleware,
+];
+
+const deleteLoggedUserValidator = [
+    check('id').isMongoId().withMessage("Invalid User ID"),
+    validatorMiddleware
+];
+
 module.exports = {
     createUserValidator,
     getUserValidator,
     updateUserValidator,
     changeUserPasswordValidator,
-    deleteUserValidator
+    deleteUserValidator,
+    updateLoggedUserDataValidator,
+    deleteLoggedUserValidator
 };

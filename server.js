@@ -8,12 +8,15 @@ dotenv.config({path: './config/config.env'});
 const ApiError = require('./utils/apiError');
 const globalError = require('./middlewares/errorMiddleware');
 const dbConnection = require('./config/database');
+
+// Importing routes
 const categoryRoute = require('./routes/categoryRoute');
 const subCategoryRoute = require('./routes/subCategoryRoute');
 const brandRoute = require('./routes/brandRoute');
 const productRoute = require('./routes/productRoute');
 const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
+const reviewRoute = require('./routes/reviewRoute');
 
 // Connect to database
 dbConnection();
@@ -43,6 +46,7 @@ app.use('/api/v1/brand', brandRoute);
 app.use('/api/v1/product', productRoute);
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 
 // Handling undefined routes

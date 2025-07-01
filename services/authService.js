@@ -6,8 +6,7 @@ const {sendEmail} = require('../utils/sendEmail');
 const bcrypt = require('bcryptjs');
 
 
-const createToken = (payload)=>jwt.sign({userId: payload},process.env.JWT_SECRET_KEY,{
-        expiresIn: process.env.JWT_EXPIRE_TIME})
+const createToken = require('../utils/createToken');
 
 exports.signup = asyncHandler(async(req, res, next)=>{
     //create user
