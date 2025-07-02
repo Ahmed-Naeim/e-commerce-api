@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({mergeParams: true}); //to merge the params from the parent route productRoute
 const {
     createReviewValidator,
     getReviewValidator,
@@ -13,10 +13,13 @@ const {
     getReviews,
     getReview,
     updateReview,
-    deleteReview
+    deleteReview,
+    createFilterObj,
+    setProductIdAndUserIdToBody
 } = require('../services/reviewService');
 
 const authService = require('../services/authService');
+
 
 
 router.route('/')
@@ -24,9 +27,12 @@ router.route('/')
         authService.protect,
         authService.allowedTo('user'),
         createReviewValidator,
+        setProductIdAndUserIdToBody, // to set product ID and user ID in the body for nested routes
         createReview)
 
-    .get(getReviewsValidator, getReviews);
+    .get(getReviewsValidator,
+        createFilterObj, // to create filter object for nested routes
+        getReviews);
 
 router.route('/:id')
     .get(getReviewValidator, getReview)

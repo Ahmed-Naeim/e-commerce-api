@@ -23,7 +23,7 @@ Nested routes are used to handle sub-categories that belong to a specific catego
 The subCategoryRoute will handle all routes that start with /:categoryId/sub-categories
 */
 const subCategoryRoute = require('./subCategoryRoute');
-router.use('/:categoryId/subCategory', subCategoryRoute);
+router.use('/:categoryId/subCategories', subCategoryRoute);
 
 router.route('/')
     .post(    

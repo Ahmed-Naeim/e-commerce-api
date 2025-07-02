@@ -3,6 +3,36 @@ const factory = require('./handlersFactory');
 const asyncHandler = require('express-async-handler');
 
 /**
+ * Middleware to set product ID for nested routes
+ * GET /api/v1/products/:productId/reviews
+ */
+exports.createFilterObj = (req, res, next) => {
+    let filterObj = {};
+    if (req.params.productId) 
+        filterObj.product = {product: req.params.productId};
+    
+    if (!req.body.product) 
+        req.body.product = req.params.productId;
+    
+    req.filterObj = filterObj;
+    next();
+};
+
+/**
+ * Middleware to set product ID in the body from the params for nested routes
+ * POST /api/v1/products/:productId/reviews
+ */
+exports.setProductIdAndUserIdToBody = (req, res, next) => {
+    // Set product ID from the params for nested routes
+    if (!req.body.product) 
+        req.body.product = req.params.productId;
+    // Set user ID from the authenticated user
+    if (!req.body.user) 
+        req.body.user = req.user._id;
+    next();
+};
+
+/**
  * @desc Create a new review
  * @route POST /api/v1/reviews
  * @access Private (user, Admin, Manager)

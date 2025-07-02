@@ -16,7 +16,7 @@ exports.deleteOne = (Model)=>
 exports.updateOne = (Model) =>
     asyncHandler(async (req, res, next) => {
         const doc = await Model.findOneAndUpdate(
-            req.params.id,
+            { _id: req.params.id },
             req.body,
             { new: true }
         );

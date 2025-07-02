@@ -5,6 +5,11 @@ const { createProduct, getProducts, getProduct, updateProduct, deleteProduct, up
 const authService = require('../services/authService');
 
 
+//nested routes for products
+const reviewRoute = require('./reviewRoute');
+router.use('/:productId/review', reviewRoute);
+
+
 router.route('/')
     .post(
         authService.protect,

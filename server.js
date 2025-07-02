@@ -40,12 +40,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 //Mounting routes
-app.use('/api/v1/category', categoryRoute);
-app.use('/api/v1/subcategory', subCategoryRoute);
-app.use('/api/v1/brand', brandRoute);
-app.use('/api/v1/product', productRoute);
-app.use('/api/v1/user', userRoute);
-app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/categories', categoryRoute);
+app.use('/api/v1/subcategories', subCategoryRoute);
+app.use('/api/v1/brands', brandRoute);
+app.use('/api/v1/products', productRoute);
+app.use('/api/v1/users', userRoute);
+app.use('/api/v1/auths', authRoute);
 app.use('/api/v1/reviews', reviewRoute);
 
 
