@@ -10,6 +10,7 @@ exports.deleteOne = (Model)=>
         if (!doc) {
             return next(new ApiError(`No document found for this ID: ${id}`, 404));
         }
+        doc.remove();
         res.status(204).json({ success: true, message: 'Product deleted successfully' });
     });
 
@@ -23,6 +24,7 @@ exports.updateOne = (Model) =>
         if (!doc) {
             return next(new ApiError(`No document found for this ID: ${id}`, 404));
         }
+        doc.save();
         res.status(200).json({ success: true, data: doc });
     });
 
