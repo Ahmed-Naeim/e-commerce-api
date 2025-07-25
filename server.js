@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const cors = require('cors');
 const compression = require('compression');
 
@@ -10,7 +11,7 @@ const globalError = require('./middlewares/errorMiddleware');
 const dbConnection = require('./config/database');
 
 // Importing routes
-const mountRoutes = require('./routes/');
+const mountRoutes = require('./routes');
 
 // Connect to database
 dbConnection();
@@ -24,8 +25,16 @@ const app = express();
 app.use(express.json());
 // Middleware for CORS
 app.use(cors());
-// Middleware for compression
+// Middleware for compression to reduce response size
 app.use(compression());
+
+
+// Checkout webhook
+app.post(
+    '/webhook-checkout',
+    express.raw({ type: 'application/json' }),
+    webhookCheckout
+);
 
 // Middleware for logging HTTP requests
 if (process.env.NODE_ENV === 'development') {
