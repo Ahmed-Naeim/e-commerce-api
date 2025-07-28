@@ -45,6 +45,10 @@ if (process.env.NODE_ENV === 'development') {
 //Mounting routes
 mountRoutes(app);
 
+app.get('/', (req, res) => {
+    res.send('API is running...');
+});
+
 // Handling undefined routes
 app.all(/.*/, (req, res, next) => {
     next(new ApiError(`Can't find ${req.originalUrl} on this server`, 404));
