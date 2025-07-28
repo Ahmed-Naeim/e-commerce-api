@@ -29,12 +29,12 @@ app.use(cors());
 app.use(compression());
 
 
-// Checkout webhook
-app.post(
-    '/webhook-checkout',
-    express.raw({ type: 'application/json' }),
-    webhookCheckout
-);
+// // Checkout webhook
+// app.post(
+//     '/webhook-checkout',
+//     express.raw({ type: 'application/json' }),
+//     webhookCheckout
+// );
 
 // Middleware for logging HTTP requests
 if (process.env.NODE_ENV === 'development') {
