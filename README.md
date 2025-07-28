@@ -1,4 +1,3 @@
-````markdown
 # E-Commerce API (Node.js)
 
 A comprehensive backend API for an e-commerce platform built with Node.js, Express, and MongoDB. This project provides all the essential features for running an online store, from user authentication to order processing.
