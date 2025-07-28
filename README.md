@@ -1,5 +1,3 @@
-Of course. Here is the complete content ready to be pasted into your `README.md` file.
-
 ````markdown
 # E-Commerce API (Node.js)
 
